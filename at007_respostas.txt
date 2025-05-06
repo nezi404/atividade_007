@@ -1,30 +1,124 @@
 --- Questao 1 - Contar linhas ---
+ENTRADA:
+def main():   
+ # open the log file
+    with open(filename, 'r') as f:
+        data = f.readlines()
+        print(len(data))
+SAIDA:
 14
 
 --- Questao 2 - Logins bem-sucedidos ---
+ENTRADA:
+def find_sucess_loggins(data):
+    value = "Accepted password"
+    for x in data:
+        fmt = "{month} {day} {time} {server} {user}[{number}]: {msg}"
+        result = parse(fmt, str(x))
+
+        if value in result.named["msg"]:
+            print(result.named["msg"])
+SAIDA:
 Mar 07 10:15:32 server1 sshd[1024]: Accepted password for user1 from 192.168.1.10 port 54321 ssh2
 Mar 07 10:20:05 server1 sshd[1060]: Accepted password for admin from 192.168.1.12 port 54789 ssh2
 Mar 07 10:40:22 server1 sshd[1138]: Accepted password for user5 from 192.168.1.16 port 55100 ssh2
 
+
 --- Questao 3 - IPs SSH ---
+ENTRADA:
+def find_ips_ssh(data):
+    ips = []
+    for line in data:
+        if "Accepted password" in line:
+            match = re.search(r'from (\d+\.\d+\.\d+\.\d+)', line)
+            if match:
+                ips.append(match.group(1))
+    return ips
+SAIDA:
 192.168.1.10
+192.168.1.11
 192.168.1.12
+192.168.1.14
+192.168.1.15
 192.168.1.16
 
 --- Questao 4 - Logins falhados ---
+ENTRADA:
+def find_failed_loggins(data):
+    value = "Failed password"
+    for x in data:
+        fmt = "{month} {day} {time} {server} sshd[{number}]: {msg}"
+        result =parse(fmt, str(x))
+
+        if result:
+            if value in result.named["msg"]:
+                print(result.named["msg"])
+SAIDA:
 Mar 07 10:18:07 server1 sshd[1055]: Failed password for user2 from 192.168.1.11 port 54632 ssh2
 Mar 07 10:25:50 server1 sshd[1101]: Failed password for root from 192.168.1.14 port 54987 ssh2
 Mar 07 10:33:05 server1 sshd[1125]: Failed password for user4 from 192.168.1.15 port 55023 ssh2
 
 --- Questao 5 - Contagem de logins OK e falhos ---
+ENTRADA:
+def count_sucess_loggins(data):
+    counter = 0
+    value = "Accepted password"
+    for x in data:
+        fmt = "{month} {day} {time} {server} sshd[{number}]: {msg}"
+        result = parse(fmt, str(x))
+
+        if result:
+            if value in result.named["msg"]:
+                counter+=1
+    
+    print(f"Number of accepted loggins: {counter}")
+
+def count_failed_loggins(data):
+    counter = 0
+    value = "Failed password"
+    for x in data:
+        fmt = "{month} {day} {time} {server} sshd[{number}]: {msg}"
+        result = parse(fmt, str(x))
+
+        if result:
+            if value in result.named["msg"]:
+                counter+=1
+    
+    print(f"Number of failed loggins: {counter}")
+SAIDA:
 Logins bem-sucedidos: 3
 Logins falhados: 3
 
 --- Questao 6 - Usuarios com sudo ---
+ENTRADA:
+def find_sudo_loggins(data):
+    for x in data:
+        fmt = "{month} {day} {time} {server} sudo[{number}]: {username} : {tty} ; PWD={pwd} ; USER={user} ; COMMAND={command}"
+        result =parse(fmt, str(x))
+
+        if result:
+            print(result.named["username"])
+SAIDA:
 user2
 user3
 
 --- Questao 7 - Logs ordenados por data/hora ---
+ENTRADA:
+def extract_sort_key(line):
+    parts = line.split()
+    if len(parts) < 3:
+        return (0, "")  # linha incompleta
+    try:
+        day = int(parts[1])
+        time = parts[2]  # formato: HH:MM:SS
+        return (day, time)
+    except ValueError:
+        return (0, "")
+
+def print_dates(data):
+    for line in data:
+        print(line.strip())
+SAIDA:
 Mar 07 10:15:32 server1 sshd[1024]: Accepted password for user1 from 192.168.1.10 port 54321 ssh2
 Mar 07 10:16:45 server1 systemd[1]: Started Apache Web Server.
 Mar 07 10:17:01 server1 cron[2048]: (root) CMD (/usr/bin/backup.sh)
@@ -41,13 +135,53 @@ Mar 07 10:45:50 server1 systemd[1]: Stopped MySQL Database Server.
 Mar 07 10:50:30 server1 sudo[1156]: user2 : TTY=pts/1 ; PWD=/home/user2 ; USER=root ; COMMAND=/bin/cat /var/log/auth.log
 
 --- Questao 8 - Usuarios que falharam mais de uma vez ---
+ENTRADA:
+def find_failed_loggins(data):
+    name_arr =[]
+    for x in data:
+        fmt = "{month} {day} {time} {server} sshd[{number}]: Failed password for {username} from {ip} port {portid} {con}"
+        result =parse(fmt, str(x))
+
+        if result:
+            name_arr.append(result.named["username"])
+    if len(name_arr) > 0:
+        rep_name_arr=[]
+        for x in name_arr:
+            if name_arr.count(x) > 1:
+                if x not in rep_name_arr:
+                    rep_name_arr.append(x)
+                    print(x)
+    print(name_arr)
+SAIDA:
 ['user2', 'root', 'user4']
 
 --- Questao 9 - Comandos sudo executados ---
+ENTRADA:
+def find_sudo_commands(data):
+    for x in data:
+        fmt = "{month} {day} {time} {server} sudo[{number}]: {username} : {tty} ; PWD={pwd} ; USER={user} ; COMMAND={command}"
+        result =parse(fmt, str(x))
+
+        if result:
+            print(result['command'])
+SAIDA:
 /bin/ls
 /bin/cat /var/log/auth.log
 
 --- Questao 10 - Contagem de IPs SSH (ordem desc) ---
+ENTRADA:
+def extract_ips(data):
+    ips = []
+    for line in data:
+        if "Accepted password" in line:
+            match = re.search(r'from (\d+\.\d+\.\d+\.\d+)', line)
+            if match:
+                ips.append(match.group(1))
+    return ips
+
+def count_ips(ips):
+    return Counter(ips).most_common()
+SAIDA:
 192.168.1.10: 1
 192.168.1.12: 1
 192.168.1.16: 1
