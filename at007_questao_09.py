@@ -14,7 +14,7 @@ def find_sudo_commands(data):
         result =parse(fmt, str(x))
 
         if result:
-            print(x)
+            print(result['command'])
 
 def main():   
     data = open_file(filename)

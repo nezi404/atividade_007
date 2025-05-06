@@ -1,34 +1,28 @@
-from parse import parse # type: ignore
 filename = "sistema.log"
 
 def open_file(file):
-     # open the log file
     with open(file, 'r') as f:
-        # read lines into list (one item per line)
-        data = f.readlines()
-        return data
+        return f.readlines()
 
-def cmp(date):
-	date=date.split()
-	print(date[1])
-	print(date[2])
-	return int(date[1]),date[2],
+def extract_sort_key(line):
+    parts = line.split()
+    if len(parts) < 3:
+        return (0, "")  # linha incompleta
+    try:
+        day = int(parts[1])
+        time = parts[2]  # formato: HH:MM:SS
+        return (day, time)
+    except ValueError:
+        return (0, "")
 
-# Utility function to print the contents
-# of the array
-def printDates(dates, n):
-	for i in range(n):
-		print(dates[i])
+def print_dates(data):
+    for line in data:
+        print(line.strip())
 
-def main():   
+def main():
     data = open_file(filename)
-    n = len(data)
-
-	# Sort the dates
-    data.sort(key=cmp)
-
-	# Print the sorted dates
-    printDates(data, n)
+    data.sort(key=extract_sort_key)
+    print_dates(data)
 
 if __name__ == "__main__":
     main()

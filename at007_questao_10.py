@@ -1,5 +1,5 @@
+from collections import Counter
 import re
-from parse import parse  # type: ignore
 
 filename = "sistema.log"
 
@@ -7,7 +7,7 @@ def open_file(file):
     with open(file, 'r') as f:
         return f.readlines()
 
-def find_ips_ssh(data):
+def extract_ips(data):
     ips = []
     for line in data:
         if "Accepted password" in line:
@@ -16,13 +16,16 @@ def find_ips_ssh(data):
                 ips.append(match.group(1))
     return ips
 
+def count_ips(ips):
+    return Counter(ips).most_common()
+
 def main():
     data = open_file(filename)
-    ips = find_ips_ssh(data)
+    ips = extract_ips(data)
+    ip_counts = count_ips(ips)
 
-    # Exibe os IPs únicos, ordenados
-    for ip in sorted(set(ips)):
-        print(ip)
+    for ip, count in ip_counts:
+        print(f"{ip}: {count}")
 
 if __name__ == "__main__":
     main()
