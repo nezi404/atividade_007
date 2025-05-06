@@ -1,3 +1,6 @@
+Nome: Nezi Pimentel Ribeiro Neta
+Nome: Samira Farias Costa De Souza
+
 --- Questao 1 - Contar linhas ---
 14
 
