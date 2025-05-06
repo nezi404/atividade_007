@@ -1,4 +1,4 @@
-from parse import parse
+from parse import parse # type: ignore
 filename = "sistema.log"
 
 def open_file(file):

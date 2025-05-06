@@ -1,4 +1,4 @@
-from parse import parse
+from parse import parse # type: ignore
 filename = "sistema.log"
 
 def open_file(file):
@@ -24,7 +24,6 @@ def find_failed_loggins(data):
                     rep_name_arr.append(x)
                     print(x)
     print(name_arr)
-
        
 def main():   
     data = open_file(filename)

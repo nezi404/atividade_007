@@ -1,4 +1,4 @@
-from parse import parse
+from parse import parse # type: ignore
 filename = "sistema.log"
 
 def open_file(file):
@@ -8,19 +8,17 @@ def open_file(file):
         data = f.readlines()
         return data
 
-def find_failed_loggins(data):
-    value = "Failed password"
+def find_sudo_loggins(data):
     for x in data:
-        fmt = "{month} {day} {time} {server} sshd[{number}]: {msg}"
+        fmt = "{month} {day} {time} {server} sudo[{number}]: {username} : {tty} ; PWD={pwd} ; USER={user} ; COMMAND={command}"
         result =parse(fmt, str(x))
 
         if result:
-            if value in result.named["msg"]:
-                print(result.named["msg"])
+            print(result.named["username"])
 
 def main():   
     data = open_file(filename)
-    find_failed_loggins(data)
+    find_sudo_loggins(data)
 
 if __name__ == "__main__":
     main()

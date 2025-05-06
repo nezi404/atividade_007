@@ -1,4 +1,4 @@
-from parse import parse
+from parse import parse # type: ignore
 filename = "sistema.log"
 
 def open_file(file):
@@ -8,13 +8,11 @@ def open_file(file):
         data = f.readlines()
         return data
 
-
 def cmp(date):
 	date=date.split()
 	print(date[1])
 	print(date[2])
 	return int(date[1]),date[2],
-
 
 # Utility function to print the contents
 # of the array
